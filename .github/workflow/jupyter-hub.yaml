@@ -39,7 +39,7 @@ jobs:
           REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
           # Build the Docker image
-          docker build -f images/image-awaiter/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG images/image-awaiter
+          docker build -f images/hub/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG images/hub
 
           # Push the Docker image
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG

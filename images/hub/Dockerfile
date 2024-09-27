@@ -10,7 +10,7 @@
 # NOTE: If the image version is updated, also update it in ci/refreeze and
 #       singleuser-sample's Dockerfile!
 #
-FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-debian-python as build-stage
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as build-stage
 
 # Build wheels
 #
@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 # This stage is built and published as quay.io/jupyterhub/k8s-hub-slim. It is meant to
 # provide no non-essential packages.
 #
-FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-debian-python as slim-stage
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as slim-stage
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG NB_USER=jovyan \

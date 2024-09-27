@@ -52,18 +52,10 @@ RUN adduser \
         --force-badname \
         ${NB_USER}
 
-RUN apt-get update -qq \
- && apt-get -y -o Dpkg::Options::="--force-confnew" upgrade \
- && apt-get install -yqq --no-install-recommends \
-        # requirement for pycurl
-        libcurl4 \
-        # requirement for using postgres database
-        libpq5 \
-        # requirement for using a local sqlite database
-        sqlite3 \
-        tini \
-        libpq-dev \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update --yes && \
+    apt-get install --yes libcurl4 libpq5 sqlite3 tini libpq-dev  &&\
+    apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \
+    && rm -rf /var/lib/apt/lists/*
 
 # install wheels built in the build stage
 # --no-index ensures _only_ wheels from the build stage are installed

@@ -1,0 +1,51 @@
+name: Build and Push Docker Image Awaiter Image to ECR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push k8s Image Waiter Docker Image
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          IMAGE_TAG: 3.3.8
+          ECR_REPOSITORY: mdaca/jupyter/k8s/image-awaiter
+        run: |
+          # Set ENV for AW Cred
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set default.region $AWS_REGION
+       
+          # Get token from ECR and Docker login
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
+ 
+          # Set ENV for Docker build
+          ECR_REPOSITORY=mdaca/jupyter/k8s/image-awaiter
+          REPOSITORY=$ECR_REPOSITORY
+          REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+          # Build the Docker image
+          docker build -f images/image-awaiter/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG images/image-awaiter
+
+          # Push the Docker image
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+          # Add latest tag
+          docker tag $REGISTRY/$REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:latest
+
+          # push latest Docker Image
+          docker push $REGISTRY/$REPOSITORY:latest

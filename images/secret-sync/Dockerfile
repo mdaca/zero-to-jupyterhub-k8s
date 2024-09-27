@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-alpine-python:3.20.2_3.11
 
 # VULN_SCAN_TIME=2024-09-09_05:05:19
 

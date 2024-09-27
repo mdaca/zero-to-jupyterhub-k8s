@@ -114,5 +114,5 @@ jobs:
         with:
           name: trivy-and-sbom-reports
           path: |
-            Image-awaiter-Trivy-Trivy.csv
+            Image-awaiter-Trivy.csv
             Image-awaiter-sbom.tf

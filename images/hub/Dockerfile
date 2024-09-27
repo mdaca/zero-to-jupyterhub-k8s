@@ -55,7 +55,7 @@ RUN adduser \
 RUN apt-get update --yes && \
     apt-get install --yes libcurl4 libpq5 sqlite3 tini libpq-dev  &&\
     apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \
-    && rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 # install wheels built in the build stage
 # --no-index ensures _only_ wheels from the build stage are installed

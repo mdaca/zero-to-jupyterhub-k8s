@@ -3,7 +3,7 @@
 #
 #        ref: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/3368
 #
-FROM alpine:3.18
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-alpine
 
 # VULN_SCAN_TIME=2024-09-16_05:05:41
 

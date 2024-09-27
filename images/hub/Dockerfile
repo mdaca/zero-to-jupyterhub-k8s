@@ -10,7 +10,7 @@
 # NOTE: If the image version is updated, also update it in ci/refreeze and
 #       singleuser-sample's Dockerfile!
 #
-FROM python:3.11-10-bookworm as build-stage
+FROM python:3.11.10-bookworm as build-stage
 
 # Build wheels
 #

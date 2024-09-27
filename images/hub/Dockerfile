@@ -10,7 +10,7 @@
 # NOTE: If the image version is updated, also update it in ci/refreeze and
 #       singleuser-sample's Dockerfile!
 #
-FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as build-stage
+FROM python:3.11-10-bookworm as build-stage
 
 # Build wheels
 #
@@ -18,10 +18,20 @@ FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubu
 # ephemeral docker cache (--mount=type=cache,target=${PIP_CACHE_DIR}). We use
 # the same technique for the directory /tmp/wheels.
 #
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+        # requirement for pycurl
+        libcurl4 \
+        # requirement for using postgres database
+        libpq5 \
+        # requirement for using a local sqlite database
+        sqlite3 \
+        tini \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
-RUN apt-get update
-RUN apt-get install -y libpq-dev libcurl4-openssl-dev
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
     pip wheel \
         --wheel-dir=/tmp/wheels \
@@ -34,81 +44,51 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         #
         py-spy
 
+RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
+    pip install --no-index --find-links=/tmp/wheels --target /opt/python-packages -r requirements.txt \
+    --no-cache-dir
 
 # The final stage - slim version
 # ------------------------------
 # This stage is built and published as quay.io/jupyterhub/k8s-hub-slim. It is meant to
 # provide no non-essential packages.
 #
-FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as slim-stage
-ENV DEBIAN_FRONTEND=noninteractive
 
+# The final stage - slim version
+# ------------------------------
+# This stage is built and published as quay.io/jupyterhub/k8s-hub-slim. It is meant to
+# provide no non-essential packages.
+#
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as final
+
+# Copy the installed Python packages from the build stage
+COPY --from=build-stage /opt/python-packages /usr/local/lib/python3.11/site-packages
+
+# Add user details
 ARG NB_USER=jovyan \
     NB_UID=1000 \
     HOME=/home/jovyan
-RUN adduser \
-        --disabled-password \
-        --gecos "Default user" \
-        --uid ${NB_UID} \
-        --home ${HOME} \
-        --force-badname \
-        ${NB_USER}
+RUN adduser --disabled-password --gecos "Default user" --uid ${NB_UID} --home ${HOME} --force-badname ${NB_USER}
 
-RUN apt-get update
-RUN apt-get install -y libpq-dev libcurl4-openssl-dev
-RUN apt-get install -y libpq5
-RUN apt-get install -y sqlite3
-RUN apt-get install -y tini
-RUN apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \
-    rm -rf /var/lib/apt/lists/*
+# Install essential system packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    dnsutils \
+    git \
+    less \
+    vim \
+    libpq5 \
+    sqlite3 \
+    tini && rm -rf /var/lib/apt/lists/*
 
-# install wheels built in the build stage
-# --no-index ensures _only_ wheels from the build stage are installed
-COPY requirements.txt /tmp/requirements.txt
-ARG PIP_CACHE_DIR=/tmp/pip-cache
-RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
-    --mount=type=cache,from=build-stage,source=/tmp/wheels,target=/tmp/wheels \
-    pip install \
-        --no-index \
-        --find-links=/tmp/wheels/ \
-        -r /tmp/requirements.txt
-
+# Set working directory
 WORKDIR /srv/jupyterhub
 RUN chown ${NB_USER}:${NB_USER} /srv/jupyterhub
+
+# Switch to non-root user
 USER ${NB_USER}
 
+# Expose port and define entrypoint and command for JupyterHub
 EXPOSE 8081
 ENTRYPOINT ["tini", "--"]
 CMD ["jupyterhub", "--config", "/usr/local/etc/jupyterhub/jupyterhub_config.py"]
-
-
-# The final stage - default version
-# ---------------------------------
-# We add a few non-critical packages on top of the slim version to provide some
-# additional utility.
-#
-FROM slim-stage as default-stage
-
-USER root
-
-ARG PIP_CACHE_DIR=/tmp/pip-cache
-RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
-    --mount=type=cache,from=build-stage,source=/tmp/wheels,target=/tmp/wheels \
-    pip install \
-        --no-index \
-        --find-links=/tmp/wheels/ \
-        # Updates below should be repeated in build-stage.
-        #
-        # py-spy is useful for profiling performance of running hubs
-        py-spy
-
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-        curl \
-        dnsutils \
-        git \
-        less \
-        vim \
- && rm -rf /var/lib/apt/lists/*
-
-USER ${NB_USER}

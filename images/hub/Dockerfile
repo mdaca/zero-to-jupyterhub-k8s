@@ -60,9 +60,34 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 # provide no non-essential packages.
 #
 FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as final
+COPY --from=build-stage /tmp/wheels /tmp/
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+        # requirement for pycurl
+        libcurl4 \
+        # requirement for using postgres database
+        libpq5 \
+        # requirement for using a local sqlite database
+        sqlite3 \
+        tini \
+ && rm -rf /var/lib/apt/lists/*
 
+COPY requirements.txt requirements.txt
+ARG PIP_CACHE_DIR=/tmp/pip-cache
+RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
+    pip wheel \
+        --wheel-dir=/tmp/wheels \
+        # pycurl 7.45.3 has wheels, but they aren't portable
+        # https://github.com/pycurl/pycurl/issues/834
+        --no-binary pycurl \
+        -r requirements.txt \
+        # Additional wheels for default-stage. Updates below should be repeated
+        # in default-stage.
+        #
+        py-spy
 # Copy the installed Python packages from the build stage
-COPY --from=build-stage /opt/python-packages /usr/local/lib/python3.11/site-packages
+
 
 # Add user details
 ARG NB_USER=jovyan \

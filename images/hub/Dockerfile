@@ -52,9 +52,9 @@ RUN adduser \
         --force-badname \
         ${NB_USER}
 
-RUN apt-get update --yes && \
-    apt-get install --yes libcurl4 libpq5 sqlite3 tini libpq-dev  &&\
-    apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \
+RUN apt-get update --yes
+RUN apt-get install --yes libcurl4 libpq5 sqlite3 tini libpq-dev
+RUN apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \
     rm -rf /var/lib/apt/lists/*
 
 # install wheels built in the build stage

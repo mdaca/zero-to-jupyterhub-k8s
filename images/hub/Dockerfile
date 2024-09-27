@@ -57,7 +57,7 @@ RUN adduser \
 RUN apt-get update
 RUN apt-get install -y libpq-dev && \
     which pg_config
-RUN ap-get-install -y libpq5
+RUN apt-get-install -y libpq5
 RUN apt-get install -y sqlite3
 RUN apt-get install -y tini
 RUN apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \

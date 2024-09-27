@@ -53,7 +53,7 @@ RUN adduser \
         ${NB_USER}
 
 RUN apt-get update -qq \
- && apt-get upgrade -yqq \
+ && apt-get -y -o Dpkg::Options::="--force-confnew" upgrade \
  && apt-get install -yqq --no-install-recommends \
         # requirement for pycurl
         libcurl4 \

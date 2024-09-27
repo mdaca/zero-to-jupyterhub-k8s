@@ -62,7 +62,7 @@ RUN apt-get update -qq \
         # requirement for using a local sqlite database
         sqlite3 \
         tini \
-        libpq-dev
+        libpq-dev \
  && rm -rf /var/lib/apt/lists/*
 
 # install wheels built in the build stage

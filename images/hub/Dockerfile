@@ -20,6 +20,8 @@ FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubu
 #
 COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
+RUN apt-get update
+RUN apt-get install -y libpq-dev
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
     pip wheel \
         --wheel-dir=/tmp/wheels \
@@ -52,8 +54,12 @@ RUN adduser \
         --force-badname \
         ${NB_USER}
 
-RUN apt-get update --yes
-RUN apt-get install --yes libcurl4 libpq5 sqlite3 tini libpq-dev
+RUN apt-get update
+RUN apt-get install -y libpq-dev && \
+    which pg_config
+RUN ap-get-install -y libpq5
+RUN apt-get install -y sqlite3
+RUN apt-get install -y tini
 RUN apt-get -y -o Dpkg::Options::="--force-confnew" upgrade && \
     rm -rf /var/lib/apt/lists/*
 

@@ -21,7 +21,7 @@ FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubu
 COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
 RUN apt-get update
-RUN apt-get install -y libpq-dev
+RUN apt-get install -y libpq-dev libcurl4-openssl-dev
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
     pip wheel \
         --wheel-dir=/tmp/wheels \
@@ -55,8 +55,7 @@ RUN adduser \
         ${NB_USER}
 
 RUN apt-get update
-RUN apt-get install -y libpq-dev && \
-    which pg_config
+RUN apt-get install -y libpq-dev libcurl4-openssl-dev
 RUN apt-get install -y libpq5
 RUN apt-get install -y sqlite3
 RUN apt-get install -y tini

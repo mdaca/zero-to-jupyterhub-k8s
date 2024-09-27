@@ -52,9 +52,9 @@ RUN adduser \
         --force-badname \
         ${NB_USER}
 
-RUN apt-get update \
+RUN apt-get update -qq \
  && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends \
+ && apt-get install -yqq --no-install-recommends \
         # requirement for pycurl
         libcurl4 \
         # requirement for using postgres database

@@ -30,7 +30,8 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 # The final stage
 # ---------------
 #
-FROM python:3.11-slim-bookworm
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:22.04_3.11 as final
+COPY --from=build-stage /tmp/wheels /tmp/
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV NB_USER=jovyan \

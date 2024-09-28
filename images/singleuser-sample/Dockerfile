@@ -46,8 +46,8 @@ RUN adduser \
         ${NB_USER}
 
 RUN apt-get update \
- && apt-get upgrade --yes \
- && apt-get install --yes --no-install-recommends \
+ && apt-get -y -o Dpkg::Options::="--force-confnew" upgrade \
+ && apt-get install -y --no-install-recommends \
         ca-certificates \
         dnsutils \
         iputils-ping \

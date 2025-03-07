@@ -41,17 +41,6 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as final
 ENV DEBIAN_FRONTEND=noninteractive
 
-ARG NB_USER=jovyan \
-    NB_UID=1000 \
-    HOME=/home/jovyan
-RUN adduser \
-        --disabled-password \
-        --gecos "Default user" \
-        --uid ${NB_UID} \
-        --home ${HOME} \
-        --force-badname \
-        ${NB_USER}
-
 RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
@@ -62,8 +51,19 @@ RUN apt-get update \
         # requirement for using a local sqlite database
         sqlite3 \
         tini \
+        # ensure adduser is available
+        adduser \
  && rm -rf /var/lib/apt/lists/*
-
+ARG NB_USER=jovyan \
+    NB_UID=1000 \
+    HOME=/home/jovyan
+RUN adduser \
+        --disabled-password \
+        --gecos "Default user" \
+        --uid ${NB_UID} \
+        --home ${HOME} \
+        --force-badname \
+        ${NB_USER}
 # install wheels built in the build stage
 # --no-index ensures _only_ wheels from the build stage are installed
 COPY requirements.txt /tmp/requirements.txt

@@ -53,6 +53,7 @@ RUN apt-get update \
         tini \
         # ensure adduser is available
         adduser \
+        libexpat1 \
  && rm -rf /var/lib/apt/lists/*
 ARG NB_USER=jovyan \
     NB_UID=1000 \
@@ -65,7 +66,8 @@ RUN usermod -u 1001 ubuntu && \
         --uid ${NB_UID} \
         --home ${HOME} \
         --force-badname \
-        ${NB_USER}
+        ${NB_USER} && \
+    python3 -m pip install --upgrade pip
 # install wheels built in the build stage
 # --no-index ensures _only_ wheels from the build stage are installed
 COPY requirements.txt /tmp/requirements.txt

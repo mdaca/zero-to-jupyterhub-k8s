@@ -37,7 +37,7 @@ cffi==1.17.1
     # via cryptography
 charset-normalizer==3.4.1
     # via requests
-cryptography==44.0.0
+cryptography==44.0.1
     # via
     #   certipy
     #   pyjwt
@@ -65,7 +65,7 @@ idna==3.10
     #   yarl
 isoduration==20.11.0
     # via jsonschema
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   jupyterhub
     #   jupyterhub-kubespawner

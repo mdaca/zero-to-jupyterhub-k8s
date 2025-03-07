@@ -5,7 +5,7 @@ on:
     branches:
       - ubuntu-24-test
     paths:
-      - 'images/hub/'
+      - 'images/hub/*'
       - '.github/workflows/jupyter-hub.yaml'
 
 jobs:

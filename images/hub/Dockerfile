@@ -57,7 +57,9 @@ RUN apt-get update \
 ARG NB_USER=jovyan \
     NB_UID=1000 \
     HOME=/home/jovyan
-RUN adduser \
+RUN usermod -u 1001 ubuntu && \
+    groupmod -g 1001 ubuntu && \
+    adduser \
         --disabled-password \
         --gecos "Default user" \
         --uid ${NB_UID} \

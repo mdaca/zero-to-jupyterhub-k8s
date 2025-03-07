@@ -106,8 +106,7 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         # Updates below should be repeated in build-stage.
         #
         # py-spy is useful for profiling performance of running hubs
-        py-spy
-
- && rm -rf /var/lib/apt/lists/*
+        py-spy && \
+    rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}

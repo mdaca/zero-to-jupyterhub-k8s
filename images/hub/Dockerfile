@@ -108,13 +108,6 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         # py-spy is useful for profiling performance of running hubs
         py-spy
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-        curl \
-        dnsutils \
-        git \
-        less \
-        vim \
  && rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}

@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 # This stage is built and published as quay.io/jupyterhub/k8s-hub-slim. It is meant to
 # provide no non-essential packages.
 #
-FROM python:3.12-slim-bookworm as slim-stage
+201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as final
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG NB_USER=jovyan \
@@ -89,7 +89,7 @@ CMD ["jupyterhub", "--config", "/usr/local/etc/jupyterhub/jupyterhub_config.py"]
 # We add a few non-critical packages on top of the slim version to provide some
 # additional utility.
 #
-FROM slim-stage as default-stage
+FROM final as default-stage
 
 USER root
 

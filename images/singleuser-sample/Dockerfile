@@ -44,6 +44,7 @@ RUN apt-get update \
         git \
         # ensure adduser is available
         adduser \
+        libexpat1 \
  && rm -rf /var/lib/apt/lists/*
 ENV NB_USER=jovyan \
     NB_UID=1000 \
@@ -56,7 +57,8 @@ RUN usermod -u 1001 ubuntu && \
         --uid ${NB_UID} \
         --home ${HOME} \
         --force-badname \
-        ${NB_USER}
+        ${NB_USER}&& \
+    python3 -m pip install --upgrade pip
 # install wheels built in the build-stage
 COPY requirements.txt /tmp/requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache

@@ -42,7 +42,7 @@ jobs:
           REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
           # Build the Docker image
-          docker build -f images/singleuser-sample/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG images/singleuser-sample
+          docker build --platform linux/amd64 -f images/singleuser-sample/Dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG images/singleuser-sample
 
           # Push the Docker image
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG

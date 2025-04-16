@@ -108,5 +108,5 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         # py-spy is useful for profiling performance of running hubs
         py-spy && \
     rm -rf /var/lib/apt/lists/*
-
+COPY --chown=${NB_USER}:${NB_USER} jupyterhub_config.py /srv/jupyterhub
 USER ${NB_USER}

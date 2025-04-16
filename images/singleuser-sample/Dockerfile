@@ -18,6 +18,11 @@ FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubu
 # ephemeral docker cache (--mount=type=cache,target=${PIP_CACHE_DIR}). We use
 # the same technique for the directory /tmp/wheels.
 #
+RUN apt-get update && apt-get install -y \
+    libexpat1 \
+ && rm -rf /var/lib/apt/lists/* \
+ && python3 -m ensurepip --upgrade \
+ && python3 -m pip install --upgrade pip
 COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
@@ -46,6 +51,7 @@ RUN apt-get update \
         adduser \
         libexpat1 \
  && rm -rf /var/lib/apt/lists/*
+
 ENV NB_USER=jovyan \
     NB_UID=1000 \
     HOME=/home/jovyan
@@ -58,6 +64,7 @@ RUN usermod -u 1001 ubuntu && \
         --home ${HOME} \
         --force-badname \
         ${NB_USER}&& \
+    python3 -m ensurepip --upgrade && \
     python3 -m pip install --upgrade pip
 # install wheels built in the build-stage
 COPY requirements.txt /tmp/requirements.txt

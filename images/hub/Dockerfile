@@ -10,7 +10,7 @@
 # NOTE: If the image version is updated, also update it in ci/refreeze and
 #       singleuser-sample's Dockerfile!
 #
-FROM python:3.12-bookworm as build-stage
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as build-stage
 
 # Build wheels
 #
@@ -108,5 +108,6 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         # py-spy is useful for profiling performance of running hubs
         py-spy && \
     rm -rf /var/lib/apt/lists/*
+RUN dpkg --remove --force-depends openssl
 COPY --chown=${NB_USER}:${NB_USER} jupyterhub_config.py /srv/jupyterhub
 USER ${NB_USER}

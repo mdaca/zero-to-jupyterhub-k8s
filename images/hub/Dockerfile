@@ -10,17 +10,13 @@
 # NOTE: If the image version is updated, also update it in ci/refreeze and
 #       singleuser-sample's Dockerfile!
 #
-FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as build-stage
+FROM python:3.12-bookworm as build-stage
 
 # Build wheels
 #
 # We set pip's cache directory and expose it across build stages via an
 # ephemeral docker cache (--mount=type=cache,target=${PIP_CACHE_DIR}). We use
 # the same technique for the directory /tmp/wheels.
-RUN apt-get update && apt-get install -y --no-install-recommends libexpat1 && \
-    python3 -m ensurepip --upgrade && \
-    python3 -m pip install --upgrade pip
-COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
     pip wheel \

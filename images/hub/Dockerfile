@@ -17,6 +17,7 @@ FROM python:3.12-bookworm as build-stage
 # We set pip's cache directory and expose it across build stages via an
 # ephemeral docker cache (--mount=type=cache,target=${PIP_CACHE_DIR}). We use
 # the same technique for the directory /tmp/wheels.
+COPY requirements.txt requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache
 RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
     pip wheel \

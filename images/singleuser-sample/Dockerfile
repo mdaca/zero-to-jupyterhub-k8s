@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1.3
-# VULN_SCAN_TIME=2025-04-14_05:07:15
+# VULN_SCAN_TIME=2025-02-24_05:06:43
 
 
 # The build stage
@@ -30,19 +30,8 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 # The final stage
 # ---------------
 #
-FROM python:3.12-slim-bookworm
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as final
 ENV DEBIAN_FRONTEND=noninteractive
-
-ENV NB_USER=jovyan \
-    NB_UID=1000 \
-    HOME=/home/jovyan
-RUN adduser \
-        --disabled-password \
-        --gecos "Default user" \
-        --uid ${NB_UID} \
-        --home ${HOME} \
-        --force-badname \
-        ${NB_USER}
 
 RUN apt-get update \
  && apt-get upgrade --yes \
@@ -53,8 +42,23 @@ RUN apt-get update \
         tini \
         # requirement for nbgitpuller
         git \
+        # ensure adduser is available
+        adduser \
+        libexpat1 \
  && rm -rf /var/lib/apt/lists/*
-
+ENV NB_USER=jovyan \
+    NB_UID=1000 \
+    HOME=/home/jovyan
+RUN usermod -u 1001 ubuntu && \
+    groupmod -g 1001 ubuntu && \
+    adduser \
+        --disabled-password \
+        --gecos "Default user" \
+        --uid ${NB_UID} \
+        --home ${HOME} \
+        --force-badname \
+        ${NB_USER}&& \
+    python3 -m pip install --upgrade pip
 # install wheels built in the build-stage
 COPY requirements.txt /tmp/requirements.txt
 ARG PIP_CACHE_DIR=/tmp/pip-cache

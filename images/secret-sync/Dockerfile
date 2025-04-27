@@ -1,6 +1,6 @@
-FROM python:3.12-alpine
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-alpine-python:3.20.6_3.12
 
-# VULN_SCAN_TIME=2025-04-14_05:05:42
+# VULN_SCAN_TIME=2024-09-09_05:05:19
 
 # Note that we use tini-static, it embeds dependencies missing in alpine
 RUN ARCH=`uname -m`; \

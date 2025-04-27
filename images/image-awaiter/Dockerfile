@@ -1,7 +1,7 @@
 # compile the code to an executable using an intermediary image
-FROM golang:1.23
+FROM golang:1.24.2-alpine3.21 AS builder
 
-# VULN_SCAN_TIME=2025-04-14_05:06:04
+# VULN_SCAN_TIME=none
 
 WORKDIR /build
 COPY *.mod \
@@ -12,18 +12,19 @@ COPY *.mod \
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -installsuffix cgo -a -o out/image-awaiter
 
 # present the result within a slimmed image
-FROM scratch
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-alpine:3.20.6 as final
 
-COPY --from=0 /build/out/image-awaiter /image-awaiter
+RUN apk add --no-cache \
+    shadow bash
 
-# To debug / develop this code
-# ----------------------------
-# 1. Setup a kubectl proxy
-# > kubectl proxy --port=8080
+# Copy the pause binary from the build stage, set ownership and permissions
+COPY --from=builder --chown=nobody /build/out/image-awaiter /image-awaiter
 
-# 2. Try the API using the proxy...
-# > curl http://localhost:8080/apis/apps/v1/namespaces/<namespace>/demonsets/hook-image-puller
+# Set the binary as executable
+RUN chmod 750 /image-awaiter
 
-# 3. Try the container using the proxy...
-# > docker build --tag <name:tag> .
-# > docker run -it --rm --net=host <name:tag> /image-awaiter -debug -namespace <namespace> -daemonset hook-image-puller
+# Switch to non-root user
+USER nobody:nobody
+
+# Set the default entrypoint to the pause binary
+ENTRYPOINT ["/image-awaiter"]

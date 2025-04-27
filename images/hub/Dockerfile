@@ -108,5 +108,4 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         py-spy && \
     rm -rf /var/lib/apt/lists/*
 RUN dpkg --remove --force-depends openssl
-COPY --chown=${NB_USER}:${NB_USER} jupyterhub_config.py /srv/jupyterhub
 USER ${NB_USER}

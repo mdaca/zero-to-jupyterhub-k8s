@@ -46,6 +46,7 @@ RUN apt-get update \
         adduser \
         libexpat1 \
         libsqlite3-0 \
+        iproute2 \
  && rm -rf /var/lib/apt/lists/*
 ENV NB_USER=jovyan \
     NB_UID=1000 \

@@ -53,6 +53,7 @@ RUN apt-get update \
         # ensure adduser is available
         adduser \
         libexpat1 \
+        iproute2 \
  && rm -rf /var/lib/apt/lists/*
 ARG NB_USER=jovyan \
     NB_UID=1000 \

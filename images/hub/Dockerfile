@@ -44,14 +44,6 @@ ENV APT_LISTCHANGES_FRONTEND=none
 ARG NB_USER=jovyan \
     NB_UID=1000 \
     HOME=/home/jovyan
-RUN adduser \
-        --disabled-password \
-        --gecos "Default user" \
-        --uid ${NB_UID} \
-        --home ${HOME} \
-        --force-badname \
-        ${NB_USER}
-
 RUN apt-get update \
  && apt-get upgrade -y -o Dpkg::Options::="--force-confold" \
  && apt-get install -y --no-install-recommends \
@@ -65,7 +57,19 @@ RUN apt-get update \
         libsqlite3-0 \
         iproute2 \
  && rm -rf /var/lib/apt/lists/*
-
+ARG NB_USER=jovyan \
+    NB_UID=1000 \
+    HOME=/home/jovyan
+RUN usermod -u 1001 ubuntu && \
+    groupmod -g 1001 ubuntu && \
+    adduser \
+        --disabled-password \
+        --gecos "Default user" \
+        --uid ${NB_UID} \
+        --home ${HOME} \
+        --force-badname \
+        ${NB_USER} && \
+    python3 -m pip install --upgrade pip
 # install wheels built in the build stage
 # --no-index ensures _only_ wheels from the build stage are installed
 COPY requirements.txt /tmp/requirements.txt

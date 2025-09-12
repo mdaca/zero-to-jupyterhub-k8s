@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 # This stage is built and published as quay.io/jupyterhub/k8s-hub-slim. It is meant to
 # provide no non-essential packages.
 #
-FROM python:3.12-slim-bookworm as slim-stage
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as final
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG NB_USER=jovyan \
@@ -112,5 +112,5 @@ RUN apt-get update \
         less \
         vim \
  && rm -rf /var/lib/apt/lists/*
-
+RUN dpkg --remove --force-depends openssl
 USER ${NB_USER}

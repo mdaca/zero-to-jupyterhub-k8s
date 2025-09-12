@@ -3,8 +3,8 @@
 #
 #        ref: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/3368
 #
-FROM alpine:3.18
+FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-alpine:3.20.7
 
-# VULN_SCAN_TIME=2025-02-17_05:04:56
+# VULN_SCAN_TIME=2024-09-16_05:05:41
 
 RUN apk add --no-cache iptables

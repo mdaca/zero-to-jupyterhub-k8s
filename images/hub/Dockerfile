@@ -40,7 +40,7 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 #
 FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as final
 ENV DEBIAN_FRONTEND=noninteractive
-
+ENV APT_LISTCHANGES_FRONTEND=none
 ARG NB_USER=jovyan \
     NB_UID=1000 \
     HOME=/home/jovyan
@@ -53,15 +53,17 @@ RUN adduser \
         ${NB_USER}
 
 RUN apt-get update \
- && apt-get upgrade -y \
+ && apt-get upgrade -y -o Dpkg::Options::="--force-confold" \
  && apt-get install -y --no-install-recommends \
-        # requirement for pycurl
-        libcurl4 \
-        # requirement for using postgres database
-        libpq5 \
-        # requirement for using a local sqlite database
-        sqlite3 \
+        ca-certificates \
+        dnsutils \
+        iputils-ping \
         tini \
+        git \
+        adduser \
+        libexpat1 \
+        libsqlite3-0 \
+        iproute2 \
  && rm -rf /var/lib/apt/lists/*
 
 # install wheels built in the build stage
@@ -89,7 +91,7 @@ CMD ["jupyterhub", "--config", "/usr/local/etc/jupyterhub/jupyterhub_config.py"]
 # We add a few non-critical packages on top of the slim version to provide some
 # additional utility.
 #
-FROM slim-stage as default-stage
+FROM final as default-stage
 
 USER root
 

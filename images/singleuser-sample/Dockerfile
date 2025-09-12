@@ -32,17 +32,16 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 #
 FROM 201959883603.dkr.ecr.us-east-2.amazonaws.com/mdaca/base-images/ironbank-ubuntu-python:24.04_3.12 as final
 ENV DEBIAN_FRONTEND=noninteractive
+ENV APT_LISTCHANGES_FRONTEND=none
 
 RUN apt-get update \
- && apt-get upgrade --yes \
- && apt-get install --yes --no-install-recommends \
+ && apt-get upgrade -y -o Dpkg::Options::="--force-confold" \
+ && apt-get install -y --no-install-recommends \
         ca-certificates \
         dnsutils \
         iputils-ping \
         tini \
-        # requirement for nbgitpuller
         git \
-        # ensure adduser is available
         adduser \
         libexpat1 \
         libsqlite3-0 \
